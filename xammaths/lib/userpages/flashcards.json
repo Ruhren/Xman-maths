@@ -1,4 +1,4 @@
-List<Map<String, String>> message = [
+[
   {
     "question": "Right angle",
     "answer": "An angle that measures 90 degrees",
@@ -36,4 +36,4 @@ List<Map<String, String>> message = [
         "Angles which occupy the same relative position where a transversal crosses two other lines. If the two lines are parallel, the corresponding angles are equal.",
     "image": "correspondingangles.jpeg"
   }
-];
+]

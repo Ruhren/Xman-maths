@@ -1,43 +1,115 @@
 import 'dart:convert';
-// import 'package:xammaths/info.json';
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-import 'package:xammaths/assets/flashcards.dart';
-
-import 'package:xammaths/home.dart';
+import 'package:flutter/services.dart';
 
 import 'package:xammaths/userpages/doubtpage.dart';
 import 'package:xammaths/userpages/pastquestions.dart';
-// import 'package:http/http.dart' as http;
+import 'package:xammaths/home.dart';
 
 class RevisionPage extends StatefulWidget {
-  const RevisionPage({super.key});
+  const RevisionPage({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _RevisionPageState createState() => _RevisionPageState();
 }
 
-//test
+class Flashcards {
+  final String question;
+  final String answer;
+  final String image;
+  FlashcardStatus status;
+
+  Flashcards({
+    required this.question,
+    required this.answer,
+    required this.image,
+    this.status = FlashcardStatus.toLearn,
+  });
+
+  factory Flashcards.fromJson(Map<String, dynamic> json) {
+    return Flashcards(
+      question: json['question'] as String,
+      answer: json['answer'] as String,
+      image: json['image'] as String,
+    );
+  }
+}
+
 class _RevisionPageState extends State<RevisionPage> {
-  List<Map<String, dynamic>> jsonList = json.decode(message);
-  List<Flashcards> flashcards =
-      jsonList.map((json) => Flashcards.fromJson(json)).toList();
+  late List<Flashcards> flashcards = [];
 
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     const RevisionPage(),
     const PastQuestions(),
     const HomePage(),
-    const DoubtPage()
+    const DoubtPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    loadJsonData();
+  }
+
+  
+
+void loadJsonData() {
+  const String jsonString = '''
+    [
+      {
+        "question": "Right angle",
+        "answer": "An angle that measures 90 degrees",
+        "image": "rightangle.jpeg"
+      },
+      {
+        "question": "Straight angle",
+        "answer": "An angle that measures between 90 and 180 degrees",
+        "image": "straightangle.jpeg"
+      },
+      {
+        "question": "Reflex angle",
+        "answer": "An angle greater than 180 degrees (but less than 360)",
+        "image": "reflexangle.jpeg"
+      },
+      {
+        "question": "Acute Angle",
+        "answer": "An angle that measures less than 90 degrees",
+        "image": "acuteangle.jpeg"
+      },
+      {
+        "question": "Transversal Line",
+        "answer": "A line that intersects two or more lines",
+        "image": "transveralline.jpeg"
+      },
+      {
+        "question": "Alternate angles",
+        "answer": "Are on opposite sides of the transversal and between the intersected lines. Alternate angles between parallel lines are equal in size.",
+        "image": "alternateangles.jpeg"
+      },
+      {
+        "question": "Corresponding angles",
+        "answer": "Angles which occupy the same relative position where a transversal crosses two other lines. If the two lines are parallel, the corresponding angles are equal.",
+        "image": "correspondingangles.jpeg"
+      }
+    ]
+  ''';
+
+  List<dynamic> jsonList = json.decode(jsonString);
+  setState(() {
+    flashcards =
+        jsonList.map((json) => Flashcards.fromJson(json)).toList();
+  });
+}
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => _widgetOptions.elementAt(_selectedIndex)),
+          builder: (context) => _widgetOptions.elementAt(_selectedIndex),
+        ),
       );
     });
   }
@@ -52,7 +124,7 @@ class _RevisionPageState extends State<RevisionPage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
-            ); // Add your back button functionality here
+            );
           },
         ),
         title: const Text(
@@ -65,25 +137,18 @@ class _RevisionPageState extends State<RevisionPage> {
         backgroundColor: Colors.teal.shade400,
       ),
       backgroundColor: const Color.fromARGB(255, 200, 230, 201),
-      body: ListView.builder(
-          itemCount: flashcards.length,
-          itemBuilder: (context, index) {
-            return FlashcardItem(
-              flashcard: flashcards[index],
-              onSwipeRight: () {
-                // Mark as learnt
-                setState(() {
-                  flashcards[index].status = FlashcardStatus.learnt;
-                });
+      body: flashcards.isNotEmpty
+          ? ListView.builder(
+              itemCount: flashcards.length,
+              itemBuilder: (context, index) {
+                return FlashcardItem(
+                  flashcard: flashcards[index],
+                );
               },
-              onSwipeLeft: () {
-                // Mark as to learn
-                setState(() {
-                  flashcards[index].status = FlashcardStatus.toLearn;
-                });
-              },
-            );
-          }),
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.green.shade200,
         showUnselectedLabels: true,
@@ -117,43 +182,13 @@ class _RevisionPageState extends State<RevisionPage> {
   }
 }
 
-//flacardinfo
-class Flashcards {
-  final String question;
-  final String answer;
-  final String image;
-  FlashcardStatus status;
-
-  Flashcards({
-    required this.question,
-    required this.answer,
-    required this.image,
-    this.status = FlashcardStatus.toLearn,
-  });
-
-  factory Flashcards.fromJson(Map<String, dynamic> json) {
-    return Flashcards(
-      question: json['question'] as String,
-      answer: json['answer'] as String,
-      image: json['image'] as String,
-    );
-  }
-}
-// dismissable
-
-enum FlashcardStatus { learnt, toLearn }
-
 class FlashcardItem extends StatelessWidget {
   final Flashcards flashcard;
-  final VoidCallback? onSwipeRight;
-  final VoidCallback? onSwipeLeft;
 
   const FlashcardItem({
-    super.key,
+    Key? key,
     required this.flashcard,
-    this.onSwipeRight,
-    this.onSwipeLeft,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -161,9 +196,9 @@ class FlashcardItem extends StatelessWidget {
       key: ValueKey(flashcard),
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
-          if (onSwipeRight != null) onSwipeRight!();
+          // Implement action for swipe right
         } else if (direction == DismissDirection.startToEnd) {
-          if (onSwipeLeft != null) onSwipeLeft!();
+          // Implement action for swipe left
         }
       },
       background: Container(
@@ -183,7 +218,7 @@ class FlashcardItem extends StatelessWidget {
             children: [
               Text(flashcard.question),
               Text(flashcard.answer),
-              Text(flashcard.image),
+              Image.asset(flashcard.image), // Uncomment if you want to display image
             ],
           ),
           subtitle: flashcard.status == FlashcardStatus.learnt
@@ -197,3 +232,5 @@ class FlashcardItem extends StatelessWidget {
     );
   }
 }
+
+enum FlashcardStatus { learnt, toLearn }

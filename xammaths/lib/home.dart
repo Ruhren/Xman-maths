@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 'Xam Maths',
-                style: TextStyle(fontSize: 80, fontFamily: 'ProtestRiot'),
+                style: TextStyle(fontSize: 75, fontFamily: 'ProtestRiot'),
               ),
             ],
           ),

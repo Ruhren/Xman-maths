@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:xammaths/Logins@reg/login.dart';
 
-import 'package:xammaths/Logins@reg/register.dart';
 import 'package:xammaths/home.dart';
 import 'userpages/doubtpage.dart';
 import 'package:xammaths/userpages/pastquestions.dart';
@@ -23,10 +21,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Xam Maths',
-      home: const Loginpage(),
+      home: const HomePage(),
       routes: {
         '/home': (context) => const HomePage(),
-        '/register': (context) => const registerPage(),
+        
         '/doubtpage': (context) => const DoubtPage(),
         '/pastquestions': (context) => const PastQuestions(),
         '/revision': (context) => const RevisionPage()
